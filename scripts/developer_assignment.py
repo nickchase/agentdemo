@@ -50,10 +50,11 @@ def recommend_reviewer(pr_files):
 
 
     response = chat_completion # openai.Completion.create(model="gpt-4", prompt=prompt, max_tokens=100)
-    
+    print(response.choices[0].message.content.strip()) 
     return response.choices[0].message.content.strip() # text.strip()
 
 def assign_reviewer(pr_url, reviewer):
+    reviewer = "roadnick"
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
     data = {"reviewers": [reviewer]}
     requests.post(f"{pr_url}/requested_reviewers", headers=headers, json=data)
