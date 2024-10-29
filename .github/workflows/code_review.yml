@@ -43,6 +43,13 @@ jobs:
           echo "::set-output name=pr_url::$pr_url"
           echo "::set-output name=pr_diff::$diff"
 
+      - name: Run Summarization Script
+        env:
+          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python scripts/summarize_pr.py "${{ steps.get_diff.outputs.pr_url }}" "${{ steps.get_diff.outputs.pr_diff }}"
+
       - name: Run Performance Review Script
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
