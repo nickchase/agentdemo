@@ -83,10 +83,4 @@ jobs:
           # Run the conflict_detection.py script with parameters
           python scripts/conflict_detection.py "$pr_url" "$base_branch" "$head_branch" "$repo_name"
 
-      - name: Run Performance Review Script
-        env:
-          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          python scripts/performance_review.py "${{ steps.get_diff.outputs.pr_url }}" "${{ steps.get_diff.outputs.pr_diff }}"
 
