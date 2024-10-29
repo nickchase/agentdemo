@@ -7,11 +7,15 @@ import sys
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+def get_content(url):
+    response = requests.get(url)
+    return response.text
+
 def summarize_changes(pr_diff):
     """
     Use OpenAI to generate a summary of the pull request changes.
     """
-    prompt = f"Summarize the following code changes in a few sentences:\n\n{pr_diff}"
+    prompt = f"Summarize the following code changes in a few sentences:\n\n{get_content(pr_diff)}"
 
     client = OpenAI(
         # This is the default and can be omitted
