@@ -35,8 +35,6 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           pr_number="${{ github.event.number }}"
-          echo "-- $GITHUB_CONTEXT --"
-          repo_name="${{ github.repository }}"
           pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
           # Fetch PR diff and store in an output variable
           diff=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$pr_url" | jq -r '.diff_url')
