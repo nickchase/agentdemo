@@ -31,7 +31,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
         run: |
-          pr_number="${{ github.event.number }}"
+          pr_number="${{ context.payload.number }}"
           echo "-- PR number: $pr_number --"
           repo_name="${{ github.repository }}"
           pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
