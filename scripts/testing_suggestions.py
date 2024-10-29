@@ -1,6 +1,7 @@
 from openai import OpenAI
 import os
 import requests
+import sys
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
@@ -33,11 +34,21 @@ def add_test_suggestions(pr_url, test_suggestions):
     data = {"body": f"Suggested Tests:\n{test_suggestions}"}
     requests.post(f"{pr_url}/comments", headers=headers, json=data)
 
-def main(pr_url, pr_diff):
+def main():
+    """
+    Main function to handle command-line arguments for `pr_url` and `pr_diff`.
+    """
+    # Ensure the script receives `pr_url` and `pr_diff` arguments
+    if len(sys.argv) < 3:
+        print("Usage: python testing_suggestions.py <pr_url> <pr_diff>")
+        sys.exit(1)
+    
+    pr_url = sys.argv[1]
+    pr_diff = sys.argv[2]
+
+    # Generate test suggestions and post them as a comment on the PR
     test_suggestions = suggest_tests(pr_diff)
     add_test_suggestions(pr_url, test_suggestions)
-    print("Test suggestions added to PR.")
 
-# Example usage
-# main("https://api.github.com/repos/nickchase/agentdemo/pulls/1", "diff content here")
-
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,6 @@
 from openai import OpenAI
 import requests
-
+import sys
 import os
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
@@ -38,11 +38,22 @@ def post_performance_feedback(pr_url, performance_feedback):
     data = {"body": f"Performance Improvement Suggestions:\n{performance_feedback}"}
     requests.post(f"{pr_url}/comments", headers=headers, json=data)
 
-def main(pr_url, pr_diff):
+def main():
+    """
+    Main function to handle command-line arguments for `pr_url` and `pr_diff`.
+    """
+    # Ensure the script receives `pr_url` and `pr_diff` arguments
+    if len(sys.argv) < 3:
+        print("Usage: python performance_review.py <pr_url> <pr_diff>")
+        sys.exit(1)
+        
+    pr_url = sys.argv[1]
+    pr_diff = sys.argv[2]
+
+    # Process the performance feedback and post it to the PR
     performance_feedback = assess_performance(pr_diff)
     post_performance_feedback(pr_url, performance_feedback)
     print("Performance feedback posted to PR.")
 
-# Example usage
-# main("https://api.github.com/repos/nickchase/agentdemo/pulls/1", "diff content here")
-
+if __name__ == "__main__":
+    main()
