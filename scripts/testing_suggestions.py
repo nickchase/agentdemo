@@ -8,7 +8,7 @@ GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 
 def suggest_tests(diff_text):
     # openai.api_key = OPENAI_API_KEY
-    prompt = f"Suggest test cases for the following code changes:\n{diff_text}"
+    prompt = f"Create the code for suggested test cases for the following code changes:\n{diff_text}"
     client = OpenAI(
         # This is the default and can be omitted
         api_key = OPENAI_API_KEY,
@@ -29,12 +29,24 @@ def suggest_tests(diff_text):
     print(response.choices[0].message.content.strip())
     return response.choices[0].message.content.strip() # text.strip()
 
-def add_test_suggestions(pr_url, test_suggestions):
-    headers = {'Authorization': f'token {GITHUB_TOKEN}'}
+def post_test_suggestions(pr_url, test_suggestions):
+    """
+    Post test suggestions as a top-level comment on the GitHub pull request.
+    """
+    headers = {
+        'Authorization': f'token {GITHUB_TOKEN}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
     data = {"body": f"Suggested Tests:\n{test_suggestions}"}
-    response = requests.post(f"{pr_url}/comments", headers=headers, json=data)
-    print(response.status_code)
-    print(response.text)
+    
+    # Use the `issues` endpoint for PR comments instead of the review comment endpoint
+    pr_comments_url = pr_url.replace('/pulls/', '/issues/') + "/comments"
+    response = requests.post(pr_comments_url, headers=headers, json=data)
+    
+    if response.status_code == 201:
+        print("Test suggestions posted successfully.")
+    else:
+        print("Failed to post test suggestions:", response.json())
 
 def main():
     """
@@ -50,7 +62,7 @@ def main():
 
     # Generate test suggestions and post them as a comment on the PR
     test_suggestions = suggest_tests(pr_diff)
-    add_test_suggestions(pr_url, test_suggestions)
+    post_test_suggestions(pr_url, test_suggestions)
 
 if __name__ == "__main__":
     main()
