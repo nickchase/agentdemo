@@ -6,9 +6,13 @@ import os
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 
+def get_content(url):
+    response = requests.get(url)
+    return response.text
+
 def assess_performance(code_diff):
-    # openai.api_key = OPENAI_API_KEY
-    prompt = f"Review the following code for potential performance improvements:\n{code_diff}"
+    
+    prompt = f"Review the following code for potential performance improvements:\n{get_content(code_diff)}"
 
     client = OpenAI(
         # This is the default and can be omitted
@@ -26,7 +30,7 @@ def assess_performance(code_diff):
     )
 
 
-    response = chat_completion # openai.Completion.create(model="gpt-4", prompt=prompt, max_tokens=100)
+    response = chat_completion # openai.Completion.create(model="gpt-4", prompt=prompt, max_tokens=500)
     print ("Response: ")
     print (response)
     return response.choices[0].message.content.strip() # text.strip()
