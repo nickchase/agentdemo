@@ -39,15 +39,23 @@ def assess_performance(code_diff):
     # return response.choices[0].text.strip()
 
 def post_performance_feedback(pr_url, performance_feedback):
-    headers = {'Authorization': f'token {GITHUB_TOKEN}'}
+    """
+    Post performance feedback as a top-level comment on the GitHub pull request.
+    """
+    headers = {
+        'Authorization': f'token {GITHUB_TOKEN}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
     data = {"body": f"Performance Improvement Suggestions:\n{performance_feedback}"}
     
-    print(f"PR URL = {pr_url}")
-    print(f"headers = {headers}")
-    print(f"data = {data}")
-
-    response = requests.post(f"{pr_url}/comments", headers=headers, json=data)
-    print(response.text)
+    # Use the `issues` endpoint for PR comments instead of the review comment endpoint
+    pr_comments_url = pr_url.replace('/pulls/', '/issues/') + "/comments"
+    response = requests.post(pr_comments_url, headers=headers, json=data)
+    
+    if response.status_code == 201:
+        print("Performance feedback posted successfully.")
+    else:
+        print("Failed to post performance feedback:", response.json())
 
 def main():
     """
