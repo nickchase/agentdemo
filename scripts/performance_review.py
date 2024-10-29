@@ -41,6 +41,11 @@ def assess_performance(code_diff):
 def post_performance_feedback(pr_url, performance_feedback):
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
     data = {"body": f"Performance Improvement Suggestions:\n{performance_feedback}"}
+    
+    print(f"PR URL = {pr_url}")
+    print(f"headers = {headers}")
+    print(f"data = {data}")
+
     requests.post(f"{pr_url}/comments", headers=headers, json=data)
 
 def main():
