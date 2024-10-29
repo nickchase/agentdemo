@@ -5,4 +5,4 @@ def simple(nameinput):
 def main(thename):
     simple(thename)
 
-main("Nick")
+main("Sarah")
