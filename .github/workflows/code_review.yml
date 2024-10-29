@@ -29,7 +29,6 @@ jobs:
           pip install openai requests gitpython
 
       - name: Fetch PR Diff
-        uses: actions/checkout@v2
         id: get_diff
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
