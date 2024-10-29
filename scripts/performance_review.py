@@ -27,7 +27,8 @@ def assess_performance(code_diff):
 
 
     response = chat_completion # openai.Completion.create(model="gpt-4", prompt=prompt, max_tokens=100)
-
+    print ("Response: ")
+    print (response)
     return response.choices[0].message.content.strip() # text.strip()
 
     # response = openai.Completion.create(model="gpt-4", prompt=prompt, max_tokens=150)
