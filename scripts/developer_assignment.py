@@ -1,5 +1,5 @@
 import requests
-import openai
+from openai import OpenAI
 import os
 
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
@@ -28,11 +28,29 @@ def get_recent_contributors(file_paths):
     return sorted(contributors, key=contributors.get, reverse=True)
 
 def recommend_reviewer(pr_files):
-    openai.api_key = OPENAI_API_KEY
+    # openai.api_key = OPENAI_API_KEY
     recent_contributors = get_recent_contributors(pr_files)
     prompt = f"Based on contributors {recent_contributors}, suggest a reviewer with relevant experience for files: {pr_files}."
-    response = openai.Completion.create(model="gpt-4", prompt=prompt, max_tokens=100)
-    return response.choices[0].text.strip()
+    
+    client = OpenAI(
+        # This is the default and can be omitted
+        api_key = OPENAI_API_KEY,
+    )    
+
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model="gpt-4",
+    )
+
+
+    response = chat_completion # openai.Completion.create(model="gpt-4", prompt=prompt, max_tokens=100)
+    
+    return response.choices[0].message.content.strip() # text.strip()
 
 def assign_reviewer(pr_url, reviewer):
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
@@ -48,5 +66,5 @@ def main(pr_url, pr_files):
         print("No suitable reviewer found.")
 
 # Example usage
-# main("https://api.github.com/repos/owner/repo/pulls/1", ["src/file1.py", "src/file2.py"])
+# main("https://api.github.com/repos/nickchase/agentdemo/pulls/1", ["tester.py"])
 
