@@ -32,7 +32,7 @@ jobs:
         id: get_diff
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
-          GITHUB_CONTEXT: ${{ toJson(context) }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           pr_number="${{ github.event.number }}"
           echo "-- PR number: $GITHUB_CONTEXT --"
