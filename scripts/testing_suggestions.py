@@ -6,9 +6,14 @@ import sys
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 
+def get_content(url):
+    response = requests.get(url)
+    return response.text
+
+
 def suggest_tests(diff_text):
     # openai.api_key = OPENAI_API_KEY
-    prompt = f"Create the code for suggested test cases for the following code changes:\n{diff_text}"
+    prompt = f"Create the code for suggested test cases for the following code changes:\n{get_content(diff_text)}"
     client = OpenAI(
         # This is the default and can be omitted
         api_key = OPENAI_API_KEY,
