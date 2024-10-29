@@ -5,6 +5,8 @@ on:
     branches:
       - '*'
   pull_request:
+    branches:
+      - "*"
     types:
       - opened
       - synchronize
@@ -30,9 +32,10 @@ jobs:
         id: get_diff
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           pr_number="${{ github.event.number }}"
-          echo "-- PR number: $pr_number --"
+          echo "-- PR number: $GITHUB_CONTEXT --"
           repo_name="${{ github.repository }}"
           pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
           # Fetch PR diff and store in an output variable
