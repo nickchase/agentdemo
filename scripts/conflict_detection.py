@@ -7,9 +7,9 @@ GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 REPO_NAME = "nickchase/agentdemo"
 
-def detect_conflicts(base_branch, head_branch):
+def detect_conflicts(base_branch, head_branch, repo_name):
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
-    print(f"https://api.github.com/repos/{REPO_NAME}/compare/{base_branch}...{head_branch}")
+    print(f"https://api.github.com/repos/{repo_name}/compare/{base_branch}...{head_branch}")
     response = requests.get(f"https://api.github.com/repos/{REPO_NAME}/compare/{base_branch}...{head_branch}", headers=headers)
     return response.json().get("conflicts", False)
 
