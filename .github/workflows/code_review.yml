@@ -56,6 +56,7 @@ jobs:
           pr_number="${{ github.event.pull_request.number }}"
           repo_name="${{ github.repository }}"
           pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
+          print pr_url
           python scripts/developer_assignment.py "$pr_url" "$repo_name"
 
       - name: Run Testing Suggestions Script
