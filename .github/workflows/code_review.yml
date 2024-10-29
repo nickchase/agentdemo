@@ -31,7 +31,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
         run: |
-          pr_number="${{ github.event.pull_request.number }}"
+          pr_number="${{ github.event.number }}"
           repo_name="${{ github.repository }}"
           pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
           # Fetch PR diff and store in an output variable
@@ -53,7 +53,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          pr_number="${{ github.event.pull_request.number }}"
+          pr_number="${{ github.event.number }}"
           repo_name="${{ github.repository }}"
           pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
           echo $pr_url
@@ -72,7 +72,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           # Set variables from the GitHub context for PR details
-          pr_number="${{ github.event.pull_request.number }}"
+          pr_number="${{ github.event.number }}"
           repo_name="${{ github.repository }}"
           pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
           base_branch="${{ github.event.pull_request.base.ref }}"
