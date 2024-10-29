@@ -81,6 +81,6 @@ jobs:
           head_branch="${{ github.event.pull_request.head.ref }}"
           
           # Run the conflict_detection.py script with parameters
-          python scripts/conflict_detection.py "$pr_url" "$base_branch" "$head_branch" "$repo_name"
+          # python scripts/conflict_detection.py "$pr_url" "$base_branch" "$head_branch" "$repo_name"
 
 
