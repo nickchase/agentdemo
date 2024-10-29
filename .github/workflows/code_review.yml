@@ -5,6 +5,8 @@ on:
     branches:
       - '*'
   pull_request:
+    branches:
+      - "*"
     types:
       - opened
       - synchronize
@@ -26,31 +28,67 @@ jobs:
           python -m pip install --upgrade pip
           pip install openai requests gitpython
 
-      - name: Run Developer Assignment Script
+      - name: Fetch PR Diff
+        id: get_diff
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-          python scripts/developer_assignment.py
-
-      - name: Run Testing Suggestions Script
-        env:
-          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          python scripts/testing_suggestions.py
-
-      - name: Run Conflict Detection Script
-        env:
-          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          python scripts/conflict_detection.py
+          pr_number="${{ github.event.number }}"
+          echo "-- PR number: $GITHUB_CONTEXT --"
+          repo_name="${{ github.repository }}"
+          pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
+          # Fetch PR diff and store in an output variable
+          diff=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$pr_url" | jq -r '.diff_url')
+          echo "PR URL: $pr_url"
+          echo "PR Diff URL: $diff"
+          echo "::set-output name=pr_url::$pr_url"
+          echo "::set-output name=pr_diff::$diff"
 
       - name: Run Performance Review Script
         env:
           GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          python scripts/performance_review.py
+          python scripts/performance_review.py "${{ steps.get_diff.outputs.pr_url }}" "${{ steps.get_diff.outputs.pr_diff }}"
+
+      - name: Run Developer Assignment Script
+        env:
+          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          pr_number="${{ github.event.number }}"
+          repo_name="${{ github.repository }}"
+          pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
+          echo $pr_url
+          python scripts/developer_assignment.py "$pr_url" "$repo_name"
+
+      - name: Run Testing Suggestions Script
+        env:
+          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python scripts/testing_suggestions.py  "${{ steps.get_diff.outputs.pr_url }}" "${{ steps.get_diff.outputs.pr_diff }}"
+
+      - name: Run Conflict Detection Script
+        env:
+          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # Set variables from the GitHub context for PR details
+          pr_number="${{ github.event.number }}"
+          repo_name="${{ github.repository }}"
+          pr_url="https://api.github.com/repos/$repo_name/pulls/$pr_number"
+          base_branch="${{ github.event.pull_request.base.ref }}"
+          head_branch="${{ github.event.pull_request.head.ref }}"
+          
+          # Run the conflict_detection.py script with parameters
+          python scripts/conflict_detection.py "$pr_url" "$base_branch" "$head_branch" "$repo_name"
+
+      - name: Run Performance Review Script
+        env:
+          GITHUB_TOKEN: ${{ secrets._GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python scripts/performance_review.py "${{ steps.get_diff.outputs.pr_url }}" "${{ steps.get_diff.outputs.pr_diff }}"
 

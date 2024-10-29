@@ -1,12 +1,15 @@
 import requests
 import openai
 import os
+import sys
 
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+REPO_NAME = "nickchase/agentdemo"
 
 def detect_conflicts(base_branch, head_branch):
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
+    print(f"https://api.github.com/repos/{REPO_NAME}/compare/{base_branch}...{head_branch}")
     response = requests.get(f"https://api.github.com/repos/{REPO_NAME}/compare/{base_branch}...{head_branch}", headers=headers)
     return response.json().get("conflicts", False)
 
@@ -21,15 +24,31 @@ def post_conflict_suggestions(pr_url, conflict_suggestions):
     data = {"body": f"Conflict Resolution Suggestion:\n{conflict_suggestions}"}
     requests.post(f"{pr_url}/comments", headers=headers, json=data)
 
-def main(pr_url, base_branch, head_branch):
-    if detect_conflicts(base_branch, head_branch):
-        conflict_details = "List of conflict files and areas"
+def main():
+    """
+    Main function to handle command-line arguments for `pr_url`, `base_branch`, `head_branch`, and `repo_name`.
+    """
+    # Ensure the script receives `pr_url`, `base_branch`, `head_branch`, and `repo_name`
+    if len(sys.argv) < 5:
+        print("Usage: python conflict_detection.py <pr_url> <base_branch> <head_branch> <repo_name>")
+        sys.exit(1)
+        
+    pr_url = sys.argv[1]
+    base_branch = sys.argv[2]
+    head_branch = sys.argv[3]
+    repo_name = sys.argv[4]
+
+    # Detect conflicts
+    conflicts = detect_conflicts(base_branch, head_branch, repo_name)
+    if conflicts:
+        # Collect conflict details for OpenAI prompt
+        conflict_details = "\n".join([file['filename'] for file in conflicts])
         conflict_suggestions = resolve_conflict_suggestion(conflict_details)
+        
+        # Post conflict resolution suggestions
         post_conflict_suggestions(pr_url, conflict_suggestions)
-        print("Conflict suggestions posted to PR.")
     else:
         print("No conflicts detected.")
 
-# Example usage
-# main("https://api.github.com/repos/owner/repo/pulls/1", "main", "feature-branch")
-
+if __name__ == "__main__":
+    main()
