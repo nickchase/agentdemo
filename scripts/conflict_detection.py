@@ -10,7 +10,7 @@ REPO_NAME = "nickchase/agentdemo"
 def detect_conflicts(base_branch, head_branch, repo_name):
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
     response = requests.get(f"https://api.github.com/repos/{REPO_NAME}/compare/{base_branch}...{head_branch}", headers=headers)
-    print response.text
+    print (response.text)
     return response.json().get("conflicts", False)
 
 def resolve_conflict_suggestion(conflict_details):
