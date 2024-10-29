@@ -26,13 +26,15 @@ def suggest_tests(diff_text):
 
 
     response = chat_completion # openai.Completion.create(model="gpt-4", prompt=prompt, max_tokens=100)
-
+    print(response.choices[0].message.content.strip())
     return response.choices[0].message.content.strip() # text.strip()
 
 def add_test_suggestions(pr_url, test_suggestions):
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
     data = {"body": f"Suggested Tests:\n{test_suggestions}"}
-    requests.post(f"{pr_url}/comments", headers=headers, json=data)
+    response = requests.post(f"{pr_url}/comments", headers=headers, json=data)
+    print(response.status_code)
+    print(response.text)
 
 def main():
     """
