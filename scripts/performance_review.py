@@ -47,7 +47,7 @@ def post_performance_feedback(pr_url, performance_feedback):
     print(f"data = {data}")
 
     response = requests.post(f"{pr_url}/comments", headers=headers, json=data)
-    print(response.status_code)
+    print(response.text)
 
 def main():
     """
